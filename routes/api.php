@@ -17,3 +17,22 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::get('laravelapi', function (){
+    return 'from laravel api';
+});
+
+
+Route::prefix('v1')->group(function () {
+    Route::name('v1.')->group(function () {
+        Route::apiResources([
+            'drivers' => 'App\Http\Controllers\DriverController',
+            'vehicles' => 'App\Http\Controllers\VehicleController',
+        ]);
+    });
+});
+
+Route::fallback(function(){
+    return response()->json([
+        'message' => 'Page Not Found. If error persists, contact info@website.com'], 404);
+});

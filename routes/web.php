@@ -15,4 +15,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
-})->middleware('auth');
+});
+
+Route::get('/laravel',function(){
+    return 'hello';
+});
