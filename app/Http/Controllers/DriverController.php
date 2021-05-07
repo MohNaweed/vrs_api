@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 
 class DriverController extends Controller
 {
+    public function login(){
+        return 0;
+    }
     /**
      * Display a listing of the resource.
      *
@@ -26,14 +29,14 @@ class DriverController extends Controller
     public function store(Request $request)
     {
         return Driver::create([
-            'name' => $request->data['name'],
-            'last_name'=> $request->data['last_name'] ?? null,
-            'license_no' => $request->data['license_no'] ?? null,
-            'license_expiry_date' => $request->data['license_expiry_date'] ?? null,
-            'mobile_no' => $request->data['mobile_no'] ?? null,
-            'NIN' => $request->data['NIN'],
-            'branch_no' => $request->data['branch_no'] ?? null,
-            'province' => $request->data['province'] ?? null
+            'name' => $request->name,
+            'last_name'=> $request->last_name ?? null,
+            'license_no' => $request->license_no ?? null,
+            'license_expiry_date' => $request->license_expiry_date ?? null,
+            'mobile_no' => $request->mobile_no ?? null,
+            'NIN' => $request->NIN,
+            'branch_no' => $request->branch_no ?? null,
+            'province' => $request->province ?? null
         ]);
     }
 
@@ -59,14 +62,14 @@ class DriverController extends Controller
     public function update(Request $request, Driver $driver)
     {
         $driver->update([
-            'name' => $request->data['name'],
-            'last_name'=> $request->data['last_name'] ?? null,
-            'license_no' => $request->data['license_no'] ?? null,
-            'license_expiry_date' => $request->data['license_expiry_date'] ?? null,
-            'mobile_no' => $request->data['mobile_no'] ?? null,
-            'NIN' => $request->data['NIN'],
-            'branch_no' => $request->data['branch_no'] ?? null,
-            'province' => $request->data['province'] ?? null
+            'name' => $request->name,
+            'last_name'=> $request->last_name ?? null,
+            'license_no' => $request->license_no ?? null,
+            'license_expiry_date' => $request->license_expiry_date ?? null,
+            'mobile_no' => $request->mobile_no ?? null,
+            'NIN' => $request->NIN,
+            'branch_no' => $request->branch_no ?? null,
+            'province' => $request->province ?? null
         ]);
 
         return $driver;

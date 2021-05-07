@@ -14,13 +14,15 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::post('login','App\Http\Controllers\DriverController@login');
+
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
 Route::get('laravelapi', function (){
     return 'from laravel api';
-});
+})->middleware('auth:sanctum');
 
 
 Route::prefix('v1')->group(function () {
