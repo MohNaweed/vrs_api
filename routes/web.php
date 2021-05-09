@@ -19,4 +19,4 @@ Route::get('/', function () {
 
 Route::get('/laravel',function(){
     return 'hello';
-});
+})->middleware('auth:sanctum');
