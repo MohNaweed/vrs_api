@@ -30,6 +30,7 @@ Route::prefix('v1')->group(function () {
         Route::apiResources([
             'drivers' => 'App\Http\Controllers\DriverController',
             'vehicles' => 'App\Http\Controllers\VehicleController',
+            'departments' => 'App\Http\Controllers\DepartmentController',
         ]);
     });
 });

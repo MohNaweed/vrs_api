@@ -27,15 +27,15 @@ class VehicleController extends Controller
     public function store(Request $request)
     {
        return Vehicle::create([
-            'vehicle_no' => $request->data['vehicle_no'],
-            'model'=> $request->data['model'] ?? null,
-            'color' => $request->data['color'] ?? null,
-            'chassis_no' => $request->data['chassis_no'] ?? null,
-            'plate' => $request->data['plate'] ?? null,
-            'type' => $request->data['type'],
-            'branch_no' => $request->data['branch_no'] ?? null,
-            'province' => $request->data['province'] ?? null,
-            'driver_id' => $request->data['driver_id']
+            'vehicle_no' => $request->vehicle_no,
+            'model'=> $request->model ?? null,
+            'color' => $request->color,
+            'chassis_no' => $request->chassis_no ?? null,
+            'plate' => $request->plate ?? null,
+            'type' => $request->type ?? null,
+            'branch_no' => $request->branch_no ?? null,
+            'province' => $request->province ?? null,
+            'driver_id' => $request->driver_id ?? null
         ]);
     }
 
@@ -59,16 +59,17 @@ class VehicleController extends Controller
      */
     public function update(Request $request, Vehicle $vehicle)
     {
+        return $request;
         $vehicle->update([
-            'vehicle_no' => $request->data['vehicle_no'],
-            'model'=> $request->data['model'] ?? null,
-            'color' => $request->data['color'] ?? null,
-            'chassis_no' => $request->data['chassis_no'] ?? null,
-            'plate' => $request->data['plate'] ?? null,
-            'type' => $request->data['type'],
-            'branch_no' => $request->data['branch_no'] ?? null,
-            'province' => $request->data['province'] ?? null,
-            'driver_id' => $request->data['driver_id']
+            'vehicle_no' => $request->vehicle_no,
+            'model'=> $request->model,
+            'color' => $request->color,
+            'chassis_no' => $request->chassis_no,
+            'plate' => $request->plate,
+            'type' => $request->type,
+            'branch_no' => $request->branch_no,
+            'province' => $request->province,
+            'driver_id' => $request->driver_id
         ]);
 
         return $vehicle;

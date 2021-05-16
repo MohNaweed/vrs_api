@@ -7,24 +7,9 @@ use Illuminate\Http\Request;
 
 class DepartmentController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+        return Department::all();
     }
 
     /**
@@ -35,51 +20,52 @@ class DepartmentController extends Controller
      */
     public function store(Request $request)
     {
-        //
+       return Department::create([
+            'name' => $request->name,
+            'description'=> $request->description ?? null,
+            'employees_count' => 5
+        ]);
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Department  $department
+     * @param  \App\Models\Vehicle  $vehicle
      * @return \Illuminate\Http\Response
      */
     public function show(Department $department)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Department  $department
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Department $department)
-    {
-        //
+        return $vehicle;
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Department  $department
+     * @param  \App\Models\Vehicle  $vehicle
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, Department $department)
     {
-        //
+        return $request;
+        $department->update([
+            'name' => $request->name,
+            'description'=> $request->description ?? null,
+            'employees_count' => 5
+        ]);
+
+        return $department;
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Department  $department
+     * @param  \App\Models\Vehicle  $vehicle
      * @return \Illuminate\Http\Response
      */
     public function destroy(Department $department)
     {
-        //
+        Department::destroy($department->id);
+        return $department;
     }
 }
