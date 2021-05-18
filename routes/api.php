@@ -31,9 +31,13 @@ Route::prefix('v1')->group(function () {
             'drivers' => 'App\Http\Controllers\DriverController',
             'vehicles' => 'App\Http\Controllers\VehicleController',
             'departments' => 'App\Http\Controllers\DepartmentController',
+            'requests' => 'App\Http\Controllers\RequestController',
         ]);
+        Route::post('/requests/all','App\Http\Controllers\RequestController@allRequest');
     });
 });
+
+
 
 Route::fallback(function(){
     return response()->json([

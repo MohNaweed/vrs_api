@@ -19,7 +19,7 @@ class CreateApprovalsTable extends Migration
             $table->unsignedInteger('department_id');
             $table->date('date')->nullable();
             $table->string('comment')->nullable();
-            $table->string('approved')->nullable();
+            $table->boolean('approved')->nullable();
 
             $table->timestamps();
         });

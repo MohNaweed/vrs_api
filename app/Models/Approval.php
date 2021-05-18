@@ -9,4 +9,9 @@ class Approval extends Model
 {
     use HasFactory;
     protected $guarded = [];
+
+
+    public function request(){
+        return $this->belongsTo(Request::class);
+    }
 }
