@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateLocationRequestsTable extends Migration
+class CreateApprovesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,13 @@ class CreateLocationRequestsTable extends Migration
      */
     public function up()
     {
-        Schema::create('location_requests', function (Blueprint $table) {
+        Schema::create('approves', function (Blueprint $table) {
             $table->id();
-            $table->unsignedInteger('request_id')->nullable();
-            $table->unsignedInteger('location_id')->nullable();
-            $table->date('date')->nullable();
+            $table->integer('approveable_id');
+            $table->string('approveable_type');
+            $table->string('department');
+            $table->string('comment');
+            $table->boolean('approved');
             $table->timestamps();
         });
     }
@@ -29,6 +31,6 @@ class CreateLocationRequestsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('location_requests');
+        Schema::dropIfExists('approves');
     }
 }

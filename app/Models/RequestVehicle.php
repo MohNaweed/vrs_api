@@ -4,14 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Approve;
 
-class Approval extends Model
+class RequestVehicle extends Model
 {
     use HasFactory;
     protected $guarded = [];
 
-
-    public function request(){
-        return $this->belongsTo(Request::class);
+    public function approves()
+    {
+        return $this->morphMany(Approve::class, 'approveable');
     }
 }

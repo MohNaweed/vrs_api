@@ -23,6 +23,7 @@ class CreateDriversTable extends Migration
             $table->string('NIN')->nullable();
             $table->string('branch_no')->nullable();
             $table->string('province')->nullable();
+            $table->unsignedInteger('user_id')->nullable();
             $table->timestamps();
         });
     }

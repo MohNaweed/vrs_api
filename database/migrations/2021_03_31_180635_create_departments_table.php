@@ -18,7 +18,6 @@ class CreateDepartmentsTable extends Migration
             $table->string('name')->nullable();
             $table->string('description')->nullable();
             $table->string('head')->nullable();
-            $table->unsignedInteger('employees_count')->nullable();
             $table->timestamps();
         });
     }

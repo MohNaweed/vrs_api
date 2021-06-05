@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use DB;
-use App\Models\Request;
+use App\Models\RequestVehicle as Request;
 use App\Models\Department;
 use App\Models\Approval;
 use App\Models\User;
@@ -111,120 +111,81 @@ class RequestController extends Controller
 
     public function store(RequestResult $request_result)
     {
+
+        //return $request_result;
         // return auth()->id();
 
         $user = User::find(auth()->id());
         $department = $user->department;
 
-        //get transport and security departments id
+        //get transport and admin departments id
         $transport = Department::where('name','Transport')->first();
-        $security = Department::where('name','Security')->first();
+        $administration = Department::where('name','Administration')->first();
 
 
-        DB::transaction(function () use($request_result,$user,$department,$transport,$security) {
+        DB::transaction(function () use($request_result,$user,$department,$transport,$administration) {
             $newRequest =  Request::create([
                 'user_id' => auth()->id(),
-                'purpose'=> $request_result->purpose ?? null,
-                'passenger_count' => $request_result->passenger_count ?? null,
-                'vehicle_id' => $request_result->vehicle_id ?? null,
-                'source_location_request_id' => $request_result->source_location_request_id ?? null,
-                'destination_location_request_id' => $request_result->destination_location_request_ids,
-                'return' => $request_result->branch_no ?? false,
+                'purpose'=> $request_result->purpose ?? 'default purpose',
+                'passenger_name' => $request_result->passengerName ?? null,
+                'passenger_contact' => $request_result->passengerContact ?? null,
+                'travel_time' => '12:16',
+                'return_time' => '11:30',
+                'source_id' => $request_result->source_id ?? null,
+                'destination_id' => $request_result->destination_id,
+                'return' => $request_result->isReturn ?? false,
+                'driver_id'=>1
             ]);
 
             // condition for creating approved records
-            if($user->department_position == 'head' && $department->name == 'Security' )
+            if(($user->department_position == 'head' && $department->name == 'Transport') || $department->name == 'Administration' )
             {
                 //return 'head security';
-                Approval::create([
-                    'request_id' => $newRequest->id,
-                    'department_id' => $department->id,
-                    'comment' => null,
+                $newRequest->approves()->create([
+
+                    'department' => $department->id,
+                    'comment' => 'default comment',
                     'approved' => true
-                ]);
-            }
-            else if($user->department_position == 'normal' && $department->name == 'Security' )
-            {
-                //return 'normal security';
-                Approval::create([
-                    'request_id' => $newRequest->id,
-                    'department_id' => $department->id,
-                    'comment' => null,
-                    'approved' => false
-                ]);
-            }
-            else if($user->department_position == 'head' && $department->name == 'Transport' )
-            {
-            // return 'head transport';
-                Approval::create([
-                    'request_id' => $newRequest->id,
-                    'department_id' => $department->id,
-                    'comment' => null,
-                    'approved' => true
-                ]);
-                Approval::create([
-                    'request_id' => $newRequest->id,
-                    'department_id' => $security->id,
-                    'comment' => null,
-                    'approved' => false
                 ]);
             }
             else if($user->department_position == 'normal' && $department->name == 'Transport' )
             {
-            // return 'normal transport';
-                Approval::create([
-                    'request_id' => $newRequest->id,
-                    'department_id' => $department->id,
-                    'comment' => null,
-                    'approved' => false
-                ]);
-                Approval::create([
-                    'request_id' => $newRequest->id,
-                    'department_id' => $security->id,
-                    'comment' => null,
+                //return 'normal security';
+                $newRequest->approves()->create([
+
+                    'department' => $department->id,
+                    'comment' => 'default comment',
                     'approved' => false
                 ]);
             }
             elseif($user->department_position == 'head')
             {
                 //return 'head others';
-                Approval::create([
-                    'request_id' => $newRequest->id,
-                    'department_id' => $department->id,
-                    'comment' => null,
+                $newRequest->approves()->create([
+
+                    'department' => $department->id,
+                    'comment' => 'default comment',
                     'approved' => true
                 ]);
-                Approval::create([
-                    'request_id' => $newRequest->id,
-                    'department_id' => $transport->id,
-                    'comment' => null,
-                    'approved' => false
-                ]);
-                Approval::create([
-                    'request_id' => $newRequest->id,
-                    'department_id' => $security->id,
-                    'comment' => null,
+                $newRequest->approves()->create([
+
+                    'department' => $administration->id,
+                    'comment' => 'default comment',
                     'approved' => false
                 ]);
             }
             else{
                 //return 'normal others';
-                Approval::create([
-                    'request_id' => $newRequest->id,
-                    'department_id' => $department->id,
-                    'comment' => null,
+                $newRequest->approves()->create([
+
+                    'department' => $department->id,
+                    'comment' => 'default comment',
                     'approved' => false
                 ]);
-                Approval::create([
-                    'request_id' => $newRequest->id,
-                    'department_id' => $transport->id,
-                    'comment' => null,
-                    'approved' => false
-                ]);
-                Approval::create([
-                    'request_id' => $newRequest->id,
-                    'department_id' => $security->id,
-                    'comment' => null,
+                $newRequest->approves()->create([
+
+                    'department' => $administration->id,
+                    'comment' => 'default comment',
                     'approved' => false
                 ]);
             }

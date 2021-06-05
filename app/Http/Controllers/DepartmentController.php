@@ -23,7 +23,6 @@ class DepartmentController extends Controller
        return Department::create([
             'name' => $request->name,
             'description'=> $request->description ?? null,
-            'employees_count' => 5
         ]);
     }
 

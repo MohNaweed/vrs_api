@@ -17,7 +17,9 @@ use Illuminate\Support\Facades\Route;
 Route::post('login','App\Http\Controllers\DriverController@login');
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+    $user =  $request->user();
+    $user->department;
+    return $user;
 });
 
 Route::get('laravelapi', function (){
@@ -32,6 +34,7 @@ Route::prefix('v1')->group(function () {
             'vehicles' => 'App\Http\Controllers\VehicleController',
             'departments' => 'App\Http\Controllers\DepartmentController',
             'requests' => 'App\Http\Controllers\RequestController',
+            'locations' => 'App\Http\Controllers\LocationController',
         ]);
         Route::post('/requests/all','App\Http\Controllers\RequestController@allRequest');
     });
