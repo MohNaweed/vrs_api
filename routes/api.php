@@ -37,6 +37,7 @@ Route::prefix('v1')->group(function () {
             'locations' => 'App\Http\Controllers\LocationController',
         ]);
         Route::post('/requests/all','App\Http\Controllers\RequestController@allRequest');
+        Route::post('/requests/approved','App\Http\Controllers\RequestController@requestApproved');
     });
 });
 

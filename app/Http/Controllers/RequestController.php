@@ -6,6 +6,7 @@ use DB;
 use App\Models\RequestVehicle as Request;
 use App\Models\Department;
 use App\Models\Approval;
+use App\Models\Location;
 use App\Models\User;
 use Illuminate\Http\Request as RequestResult;
 
@@ -14,59 +15,47 @@ class RequestController extends Controller
 
     public function allRequest(){
 
-         //get transport and security departments id
-         $transport = Department::where('name','Transport')->first();
-         $security = Department::where('name','Security')->first();
+
+
+         //get transport and administration departments id
+        $transport = Department::where('name','Transport')->first();
+        $administration = Department::where('name','Administration')->first();
 
 
         $currentUser = User::find(Auth()->id());
         $requestedUserPosition = $currentUser->department_position;
         $requestedUserDepartment = $currentUser->department->name;
-        $allRequest = Request::withCount('approvals')->get();
+        $allRequest = Request::withCount('approves')->get();
         foreach($allRequest as $req){
-            $req->approvals;
+            $req->approves;
+            $user = $req->user;
+            $req->source = Location::find($req->source_id)->address;
+            $req->destination = Location::find($req->destination_id)->address;
+            foreach($req->approves as $app){
+                $app->department = Department::find($app->department_id)->name;
+            }
         }
+
+
+
 
         //return requests which their transport's approval was to true;
         $requests = [];
-        if ($requestedUserPosition == "head"  && $requestedUserDepartment == "Security")
+        if ($requestedUserDepartment == "Administration" || ($requestedUserPosition == "head"  && $requestedUserDepartment == "Transport"))
         {
             foreach ($allRequest as $req)
             {
 
-                if($req->approvals_count == 1)
+                if($req->approves_count == 1)
                 {
                     array_push($requests,$req);
                 }
                 else
                 {
 
-                    foreach($req->approvals as $app)
+                    foreach($req->approves as $app)
                     {
-                        if($app->department_id == $transport->id && $app->approved == true)
-                            array_push($requests,$req);
-                    }
-
-                }
-
-            }
-        }
-        elseif($requestedUserPosition == "head"  && $requestedUserDepartment == "Transport")
-        {
-
-            foreach ($allRequest as $req)
-            {
-
-                if($req->approvals_count == 2)
-                {
-                    array_push($requests,$req);
-                }
-                else
-                {
-
-                    foreach($req->approvals as $app)
-                    {
-                        if($app->department_id != $security->id && $app->department_id != $transport->id   && $app->approved == true)
+                        if($app->department_id != $administration->id && $app->department_id != $transport->id   && $app->approved == true)
                             array_push($requests,$req);
                     }
 
@@ -77,7 +66,7 @@ class RequestController extends Controller
         elseif($requestedUserPosition == "head"){
             foreach ($allRequest as $req)
             {
-                foreach($req->approvals as $app)
+                foreach($req->approves as $app)
                 {
                     if($app->department_id == $currentUser->department_id)
                         array_push($requests,$req);
@@ -98,9 +87,9 @@ class RequestController extends Controller
         $department = $user->department;
         $requests = $user->requests;
         foreach ($requests as $req){
-            $req->approvals;
+            $req->approves;
         }
-        //$approvals = $requests[0]->approvals;
+        //$approves = $requests[0]->approves;
         $departmentPositon = $user->department_position;
         return $user;
 
@@ -117,6 +106,7 @@ class RequestController extends Controller
 
         $user = User::find(auth()->id());
         $department = $user->department;
+
 
         //get transport and admin departments id
         $transport = Department::where('name','Transport')->first();
@@ -143,7 +133,7 @@ class RequestController extends Controller
                 //return 'head security';
                 $newRequest->approves()->create([
 
-                    'department' => $department->id,
+                    'department_id' => $user->department_id,
                     'comment' => 'default comment',
                     'approved' => true
                 ]);
@@ -153,7 +143,7 @@ class RequestController extends Controller
                 //return 'normal security';
                 $newRequest->approves()->create([
 
-                    'department' => $department->id,
+                    'department_id' => $department->id,
                     'comment' => 'default comment',
                     'approved' => false
                 ]);
@@ -163,13 +153,13 @@ class RequestController extends Controller
                 //return 'head others';
                 $newRequest->approves()->create([
 
-                    'department' => $department->id,
+                    'department_id' => $department->id,
                     'comment' => 'default comment',
                     'approved' => true
                 ]);
                 $newRequest->approves()->create([
 
-                    'department' => $administration->id,
+                    'department_id' => $administration->id,
                     'comment' => 'default comment',
                     'approved' => false
                 ]);
@@ -178,13 +168,13 @@ class RequestController extends Controller
                 //return 'normal others';
                 $newRequest->approves()->create([
 
-                    'department' => $department->id,
+                    'department_id' => $department->id,
                     'comment' => 'default comment',
                     'approved' => false
                 ]);
                 $newRequest->approves()->create([
 
-                    'department' => $administration->id,
+                    'department_id' => $administration->id,
                     'comment' => 'default comment',
                     'approved' => false
                 ]);
@@ -212,5 +202,9 @@ class RequestController extends Controller
     public function destroy(Request $request)
     {
         //
+    }
+
+    public function requestApproved(RequestResult $request_result){
+
     }
 }

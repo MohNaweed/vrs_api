@@ -15,4 +15,8 @@ class RequestVehicle extends Model
     {
         return $this->morphMany(Approve::class, 'approveable');
     }
+
+    public function user(){
+        return $this->belongsTo(User::class);
+    }
 }

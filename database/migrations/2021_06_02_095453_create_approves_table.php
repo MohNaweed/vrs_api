@@ -17,7 +17,7 @@ class CreateApprovesTable extends Migration
             $table->id();
             $table->integer('approveable_id');
             $table->string('approveable_type');
-            $table->string('department');
+            $table->unsignedInteger('department_id');
             $table->string('comment');
             $table->boolean('approved');
             $table->timestamps();
