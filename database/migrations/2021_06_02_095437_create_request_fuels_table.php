@@ -18,8 +18,8 @@ class CreateRequestFuelsTable extends Migration
             $table->unsignedInteger('driver_id');
             $table->integer('distance_km');
             $table->string('fuel_type');
-            $table->integer('fuel_quantity');
-            $table->string('fuel_price');
+            $table->integer('fuel_quantity')->nullable();
+            $table->string('fuel_price')->nullable();
             $table->timestamps();
         });
     }

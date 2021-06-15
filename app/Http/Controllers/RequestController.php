@@ -5,13 +5,24 @@ namespace App\Http\Controllers;
 use DB;
 use App\Models\RequestVehicle as Request;
 use App\Models\Department;
-use App\Models\Approval;
+use App\Models\Approve;
 use App\Models\Location;
 use App\Models\User;
 use Illuminate\Http\Request as RequestResult;
+use App\Notifications\requestVehicle;
 
 class RequestController extends Controller
 {
+
+    public function test(){
+
+        $user = User::find(auth()->id());
+        //return $user;
+        $user->notify(new requestVehicle('newthing'));
+        return 0;
+
+    }
+
 
     public function allRequest(){
 
@@ -206,5 +217,14 @@ class RequestController extends Controller
 
     public function requestApproved(RequestResult $request_result){
 
+        $app = Approve::find($request_result->approveID);
+        $app->approved = 1;
+        $app->save();
+
+        $req = Request::find($request_result->requestID);
+        $req->driver_id = $request_result->driverID ?? 0;
+        $req->save();
+
+        return $request_result;
     }
 }
