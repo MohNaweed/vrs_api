@@ -15,12 +15,15 @@ class CreateRequestVehiclesTable extends Migration
     {
         Schema::create('request_vehicles', function (Blueprint $table) {
             $table->id();
-            $table->string('purpose');
-            $table->string('passenger_name');
-            $table->string('passenger_contact');
+            $table->string('number')->nullable();
+            $table->string('purpose')->nullable();
+            $table->string('passenger_name')->nullable();
+            $table->string('passenger_contact')->nullable();
+            $table->string('comment')->nullable();
+            $table->string('status')->nullable(); // , pending, deny
             $table->time('travel_time');
             $table->time('return_time')->nullable();
-            $table->boolean('return');
+            $table->boolean('return')->nullable();
             $table->unsignedInteger('source_id');
             $table->unsignedInteger('destination_id');
             $table->unsignedInteger('user_id');

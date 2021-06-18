@@ -23,7 +23,6 @@ class CreateVehiclesTable extends Migration
             $table->string('type')->nullable();
             $table->string('branch_no')->nullable();
             $table->string('province')->nullable();
-            $table->unsignedInteger('driver_id');
             $table->string('image')->nullable();
 
             $table->timestamps();

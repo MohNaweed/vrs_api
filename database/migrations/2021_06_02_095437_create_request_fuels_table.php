@@ -20,6 +20,7 @@ class CreateRequestFuelsTable extends Migration
             $table->string('fuel_type');
             $table->integer('fuel_quantity')->nullable();
             $table->string('fuel_price')->nullable();
+            $table->unsignedInteger('gas_station_id')->nullable();
             $table->timestamps();
         });
     }

@@ -20,7 +20,8 @@ class CreateUsersTable extends Migration
             $table->string('email')->unique();
             $table->unsignedInteger('department_id')->nullable();
             $table->string('image')->nullable();
-            $table->string('department_position')->default('normal');
+            $table->string('department_position')->default('standard');
+            $table->integer('is_driver')->default(0);
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
