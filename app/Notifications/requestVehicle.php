@@ -2,10 +2,10 @@
 
 namespace App\Notifications;
 
-use BroadcastMessage;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
 
 class requestVehicle extends Notification implements ShouldQueue
