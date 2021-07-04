@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use DB;
+use Illuminate\Database\Eloquent\Builder;
 use App\Models\RequestVehicle as Request;
 use App\Models\Department;
 use App\Models\Approve;
@@ -10,6 +11,7 @@ use App\Models\Location;
 use App\Models\User;
 use Illuminate\Http\Request as RequestResult;
 use App\Notifications\requestVehicle;
+use App\Notifications\RequestVehicleNotification;
 
 class RequestController extends Controller
 {
@@ -23,86 +25,60 @@ class RequestController extends Controller
 
     }
 
-
-    public function allRequest(){
-
-
-
-         //get transport and administration departments id
-        $transport = Department::where('name','Transport')->first();
-        $administration = Department::where('name','Administration')->first();
-
-
+    public function belongsRequests(){
         $currentUser = User::find(Auth()->id());
         $requestedUserPosition = $currentUser->department_position;
         $requestedUserDepartment = $currentUser->department->name;
-        $allRequest = Request::withCount('approves')->get();
-        foreach($allRequest as $req){
-            $req->approves;
-            $user = $req->user;
-            $req->source = Location::find($req->source_id)->address;
-            $req->destination = Location::find($req->destination_id)->address;
-            foreach($req->approves as $app){
-                $app->department = Department::find($app->department_id)->name;
-            }
+        if($requestedUserPosition === 'head' && ($requestedUserDepartment === 'Security' || $requestedUserDepartment === 'Transport')){
+            return Request::where('status','!=','clear')->get();
         }
+        else if ($requestedUserPosition === 'head'){
+            $department = Department::find($currentUser->department_id);
+            return $department->requestVehicles->where('status','!=','clear');;
 
-
-
-
-        //return requests which their transport's approval was to true;
-        $requests = [];
-        if ($requestedUserDepartment == "Administration" || ($requestedUserPosition == "head"  && $requestedUserDepartment == "Transport"))
-        {
-            foreach ($allRequest as $req)
-            {
-
-                if($req->approves_count == 1)
-                {
-                    array_push($requests,$req);
-                }
-                else
-                {
-
-                    foreach($req->approves as $app)
-                    {
-                        if($app->department_id != $administration->id && $app->department_id != $transport->id   && $app->approved == true)
-                            array_push($requests,$req);
-                    }
-
-                }
-
-            }
         }
-        elseif($requestedUserPosition == "head"){
-            foreach ($allRequest as $req)
-            {
-                foreach($req->approves as $app)
-                {
-                    if($app->department_id == $currentUser->department_id)
-                        array_push($requests,$req);
-                }
+    }
 
-            }
+
+
+    public function clearedRequests(){
+        $currentUser = User::find(Auth()->id());
+        $requestedUserPosition = $currentUser->department_position;
+        $requestedUserDepartment = $currentUser->department->name;
+        $requestedUserDepartmentID = $currentUser->department->id;
+        if($requestedUserPosition === 'head' && ($requestedUserDepartment === 'Security' || $requestedUserDepartment === 'Transport')){
+
+            return Request::with(['sourceLocation','destinationLocation','approves.department','user.department','driver.vehicle'])->where('status','clear')->get();
+
         }
+        else if ($requestedUserPosition === 'head'){
+            // $department = Department::find($currentUser->department_id);
+            // return $department->requestVehicles->where('status','clear');
+            return Request::with(['sourceLocation','destinationLocation','approves.department','user.department','driver.vehicle'])->whereHas('user', function (Builder $query) use($requestedUserDepartmentID){
 
-        return $requests;
+                $query->where('department_id', $requestedUserDepartmentID);
+            })->get();
 
-        //return $requestedUserDepartment;
+        }
+    }
+    public function allRequest(){
+
+        $currentUser = User::find(Auth()->id());
+
+        if($currentUser->department_position === 'head'){
+            return Request::with(['sourceLocation','destinationLocation','approves.department','user.department','driver.vehicle'])->where('status',$currentUser->department->name)->get();
+        }
+        return [];
+
     }
 
     public function index()
     {
-        $request = Request::all();
+
+
         $user = User::find(auth()->id());
-        $department = $user->department;
-        $requests = $user->requests;
-        foreach ($requests as $req){
-            $req->approves;
-        }
-        //$approves = $requests[0]->approves;
-        $departmentPositon = $user->department_position;
-        return $user;
+
+        return Request::with(['sourceLocation','destinationLocation','approves.department','user.department','driver.vehicle'])->where('user_id',$user->id)->get();
 
 
     }
@@ -119,45 +95,118 @@ class RequestController extends Controller
         $department = $user->department;
 
 
-        //get transport and admin departments id
+        //get transport and security departments id
         $transport = Department::where('name','Transport')->first();
-        $administration = Department::where('name','Administration')->first();
+        $security = Department::where('name','Security')->first();
 
 
-        DB::transaction(function () use($request_result,$user,$department,$transport,$administration) {
+        DB::transaction(function () use($request_result,$user,$department,$transport,$security) {
             $newRequest =  Request::create([
                 'user_id' => auth()->id(),
                 'purpose'=> $request_result->purpose ?? 'default purpose',
                 'passenger_name' => $request_result->passengerName ?? null,
                 'passenger_contact' => $request_result->passengerContact ?? null,
-                'travel_time' => '12:16',
-                'return_time' => '11:30',
+                'comment' => $request_result->comment ?? null,
+                'travel_time' => $request_result->travelTime,
+                'return_time' => $request_result->returnTime,
                 'source_id' => $request_result->source_id ?? null,
                 'destination_id' => $request_result->destination_id,
                 'return' => $request_result->isReturn ?? false,
-                'driver_id'=>1
+                'status' => 'initial',
+                'driver_id'=>$request_result->driverID
             ]);
 
+            $newRequest->user;
+
             // condition for creating approved records
-            if(($user->department_position == 'head' && $department->name == 'Transport') || $department->name == 'Administration' )
+            if($user->department_position == 'head' && $department->name == 'Security')
             {
                 //return 'head security';
                 $newRequest->approves()->create([
 
-                    'department_id' => $user->department_id,
+                    'department_id' => $security->id,
                     'comment' => 'default comment',
                     'approved' => true
                 ]);
+                $newRequest->approves()->create([
+
+                    'department_id' => $transport->id,
+                    'comment' => 'default comment',
+                    'approved' => false
+                ]);
+
+                $newRequest->status = $transport->name;
+                $newRequest->save();
+
+                //Notification sent to all head of Transport Department
+                $this->sendNotification($transport->id, $newRequest);
             }
-            else if($user->department_position == 'normal' && $department->name == 'Transport' )
+            else if($department->name == 'Security'){
+
+                $newRequest->approves()->create([
+
+                    'department_id' => $security->id,
+                    'comment' => 'default comment',
+                    'approved' => false
+                ]);
+                $newRequest->approves()->create([
+
+                    'department_id' => $transport->id,
+                    'comment' => 'default comment',
+                    'approved' => false
+                ]);
+
+                $newRequest->status = $security->name;
+                $newRequest->save();
+
+
+                //Notification sent to all head of Transport Department
+                $this->sendNotification($security->id, $newRequest);
+
+            }
+            else if($user->department_position == 'head' && $department->name == 'Transport' )
             {
                 //return 'normal security';
                 $newRequest->approves()->create([
 
-                    'department_id' => $department->id,
+                    'department_id' => $transport->id,
+                    'comment' => 'default comment',
+                    'approved' => true
+                ]);
+                $newRequest->approves()->create([
+
+                    'department_id' => $security->id,
                     'comment' => 'default comment',
                     'approved' => false
                 ]);
+
+                $newRequest->status = $security->name;
+                $newRequest->save();
+
+
+                //Notification sent to all head of Transport Department
+                $this->sendNotification($security->id, $newRequest);
+            }
+            else if($department->name == 'Transport'){
+                $newRequest->approves()->create([
+
+                    'department_id' => $transport->id,
+                    'comment' => 'default comment',
+                    'approved' => false
+                ]);
+                $newRequest->approves()->create([
+
+                    'department_id' => $security->id,
+                    'comment' => 'default comment',
+                    'approved' => false
+                ]);
+
+                $newRequest->status = $transport->name;
+                $newRequest->save();
+
+
+                 //Notification sent to all head of Transport Department
+                $this->sendNotification($transport->id, $newRequest);
             }
             elseif($user->department_position == 'head')
             {
@@ -170,13 +219,25 @@ class RequestController extends Controller
                 ]);
                 $newRequest->approves()->create([
 
-                    'department_id' => $administration->id,
+                    'department_id' => $transport->id,
                     'comment' => 'default comment',
                     'approved' => false
                 ]);
+                $newRequest->approves()->create([
+
+                    'department_id' => $security->id,
+                    'comment' => 'default comment',
+                    'approved' => false
+                ]);
+
+                $newRequest->status = $transport->name;
+                $newRequest->save();
+
+                 //Notification sent to all head of Transport Department
+                $this->sendNotification($transport->id, $newRequest);
             }
             else{
-                //return 'normal others';
+
                 $newRequest->approves()->create([
 
                     'department_id' => $department->id,
@@ -185,10 +246,23 @@ class RequestController extends Controller
                 ]);
                 $newRequest->approves()->create([
 
-                    'department_id' => $administration->id,
+                    'department_id' => $transport->id,
                     'comment' => 'default comment',
                     'approved' => false
                 ]);
+                $newRequest->approves()->create([
+
+                    'department_id' => $security->id,
+                    'comment' => 'default comment',
+                    'approved' => false
+                ]);
+
+                $newRequest->status = $department->name;
+                $newRequest->save();
+
+
+                 //Notification sent to all head of Transport Department
+                $this->sendNotification($department->id, $newRequest);
             }
 
         });
@@ -197,34 +271,77 @@ class RequestController extends Controller
 
     }
 
-
-    public function show(Request $request)
-    {
-        //
-    }
-
-
-    public function update(RequestResult $request_result, Request $request)
-    {
-        //
-    }
-
-
-    public function destroy(Request $request)
-    {
-        //
-    }
-
     public function requestApproved(RequestResult $request_result){
+
+        //get transport and security departments id
+        $transport = Department::where('name','Transport')->first();
+        $security = Department::where('name','Security')->first();
+
+        $user = User::find(auth()->id());
+        $requestDepartment = Request::find($request_result->requestID)->user->department;
 
         $app = Approve::find($request_result->approveID);
         $app->approved = 1;
         $app->save();
 
         $req = Request::find($request_result->requestID);
+        $req->user;
         $req->driver_id = $request_result->driverID ?? 0;
-        $req->save();
+
+        if($user->department_position === 'head' && $user->department->name === $security->name){
+            if($requestDepartment->name === $security->name){
+                $req->status = $transport->name;
+                $req->save();
+                $this->sendNotification($transport->id,$req);
+            }
+            else{
+                $req->status = 'clear';
+                $req->save();
+                $user = User::find($req->user_id);
+                $user->notify(new RequestVehicleNotification($req));
+            }
+        }
+        else if($user->department_position === 'head' && $user->department->name === $transport->name){
+            if($requestDepartment->name === $security->name){
+                $req->status = 'clear';
+                $req->driver_id = $request_result->driverID;
+                $req->save();
+                $user = User::find($req->user_id);
+                $user->notify(new RequestVehicleNotification($req));
+            }
+            else{
+                $req->status = $security->name;
+                $req->driver_id = $request_result->driverID;
+                $req->save();
+                $this->sendNotification($security->id,$req);
+            }
+        }
+        else if($user->department_position === 'head'){
+                $req->status = $transport->name;
+                $req->save();
+                $this->sendNotification($transport->id,$req);
+        }
+
+       // $req->save();
+
 
         return $request_result;
+    }
+
+
+
+
+
+    private function sendNotification($departmentID,$requestData){
+       //Notification sent to all head of Transport Department
+        $usersnotify = User::where([
+            ['department_position','=','head'],
+            ['department_id','=',$departmentID]
+            ])->get();
+
+
+        foreach($usersnotify as $un){
+            $un->notify(new RequestVehicleNotification($requestData));
+        }
     }
 }

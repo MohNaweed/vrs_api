@@ -15,4 +15,13 @@ class Department extends Model
     public function users(){
         return $this->hasMany(User::class);
     }
+
+    public function requestVehicles()
+    {
+        return $this->hasManyThrough(RequestVehicle::class, User::class);
+    }
+
+    public function approves(){
+        return $this->hasMany(Approve::class);
+    }
 }

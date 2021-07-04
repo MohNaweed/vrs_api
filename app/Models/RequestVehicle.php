@@ -19,4 +19,20 @@ class RequestVehicle extends Model
     public function user(){
         return $this->belongsTo(User::class);
     }
+
+    public function driver(){
+        return $this->belongsTo(Driver::class);
+    }
+
+    public function driverVehicle(){
+        return $this->hasOneThrough(Vehicle::class, Driver::class);
+    }
+
+    public function sourceLocation(){
+        return $this->belongsTo(Location::class,'source_id');
+    }
+
+    public function destinationLocation(){
+        return $this->belongsTo(Location::class,'destination_id');
+    }
 }

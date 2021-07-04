@@ -14,4 +14,10 @@ class Approve extends Model
     {
         return $this->morphTo();
     }
+
+
+    public function department(){
+        return $this->belongsTo(Department::class);
+    }
+
 }

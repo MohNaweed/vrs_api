@@ -21,8 +21,8 @@ class CreateRequestVehiclesTable extends Migration
             $table->string('passenger_contact')->nullable();
             $table->string('comment')->nullable();
             $table->string('status')->nullable(); // , pending, deny
-            $table->time('travel_time');
-            $table->time('return_time')->nullable();
+            $table->string('travel_time');
+            $table->string('return_time')->nullable();
             $table->boolean('return')->nullable();
             $table->unsignedInteger('source_id');
             $table->unsignedInteger('destination_id');

@@ -20,6 +20,8 @@ Route::post('login','App\Http\Controllers\DriverController@login');
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     $user =  $request->user();
     $user->department;
+    $user->unreadNotificationsCount = $user->unreadNotifications->count();
+    $user->notifications = $user->notifications;
 
 
     $driver = Driver::where('user_id', '=', $user->id)->first();
@@ -45,13 +47,25 @@ Route::prefix('v1')->group(function () {
             'departments' => 'App\Http\Controllers\DepartmentController',
             'requests' => 'App\Http\Controllers\RequestController',
             'locations' => 'App\Http\Controllers\LocationController',
-            'requestfuel' => 'App\Http\Controllers\RequestFuelController'
+            'requestfuel' => 'App\Http\Controllers\RequestFuelController',
+            'gasstation' => 'App\Http\Controllers\GasStationController',
         ]);
         Route::post('/requests/all','App\Http\Controllers\RequestController@allRequest');
-        Route::post('/requests/fuel/all','App\Http\Controllers\RequestFuelController@allRequest');
+        Route::post('/requests/cleared','App\Http\Controllers\RequestController@clearedRequests');
+        Route::post('/requests/belongs','App\Http\Controllers\RequestController@belongsRequests');
         Route::post('/requests/approved','App\Http\Controllers\RequestController@requestApproved');
+
+
+        Route::post('/requests/fuel/all','App\Http\Controllers\RequestFuelController@allRequest');
         Route::post('/requests/fuel/approved','App\Http\Controllers\RequestFuelController@requestApproved');
         Route::post('/test','App\Http\Controllers\RequestController@test');
+
+        //Notifications API
+        Route::get('/notifications/read','App\Http\Controllers\NotificationController@readNotifications');
+        Route::get('/notifications/all','App\Http\Controllers\NotificationController@notifications');
+        Route::get('/notifications/unread','App\Http\Controllers\NotificationController@unreadNotifications');
+        Route::post('/notifications/markasread','App\Http\Controllers\NotificationController@markAsReadNotifications');
+        Route::post('/notifications/destroy','App\Http\Controllers\NotificationController@destroyNotifications');
     });
 });
 

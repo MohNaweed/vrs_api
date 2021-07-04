@@ -10,7 +10,7 @@ class LocationController extends Controller
 
     public function index()
     {
-        return Location::orderBy('address','desc')->get();
+        return Location::orderBy('state','desc')->get();
     }
 
     public function store(Request $request)
