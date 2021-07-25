@@ -16,6 +16,7 @@ class CreateRequestFuelsTable extends Migration
         Schema::create('request_fuels', function (Blueprint $table) {
             $table->id();
             $table->unsignedInteger('driver_id');
+            $table->unsignedInteger('user_id');
             $table->integer('distance_km');
             $table->string('fuel_type');
             $table->integer('fuel_quantity')->nullable();

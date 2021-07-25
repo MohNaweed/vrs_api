@@ -57,6 +57,7 @@ Route::prefix('v1')->group(function () {
 
 
         Route::post('/requests/fuel/all','App\Http\Controllers\RequestFuelController@allRequest');
+        Route::post('/requests/fuel/pendings','App\Http\Controllers\RequestFuelController@pendingRequests');
         Route::post('/requests/fuel/approved','App\Http\Controllers\RequestFuelController@requestApproved');
         Route::post('/test','App\Http\Controllers\RequestController@test');
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use DB;
+use Illuminate\Database\Eloquent\Builder;
 use App\Models\RequestFuel;
 use App\Models\Driver;
 use App\Models\Department;
@@ -17,13 +18,29 @@ class RequestFuelController extends Controller
         $user = User::find(auth()->id());
 
         $user->department;
-        if($user->department->name === 'Administration' || ($user->department->name === 'Transport'  && $user->department_position === 'head')){
+        if($user->department->name === 'Transport'  && $user->department_position === 'head'){
 
-            $requests = RequestFuel::withCount('approves')->get();
+            $requests = RequestFuel::with(['approve.department'])->whereHas('approve', function (Builder $query){
 
-            foreach($requests as $req){
-                $req->approves;
-            }
+                $query->where('approved', 1);
+            })->get();
+
+            return $requests;
+        }
+    }
+
+    public function pendingRequests(){
+
+        $user = User::find(auth()->id());
+
+
+        $user->department;
+        if($user->department->name === 'Transport'  && $user->department_position === 'head'){
+
+            $requests = RequestFuel::with('approve')->whereHas('approve', function (Builder $query){
+
+                $query->where('approved', 0);
+            })->get();
 
             return $requests;
         }
@@ -31,7 +48,8 @@ class RequestFuelController extends Controller
 
     public function index()
     {
-        //
+        $user = User::find(auth()->id());
+        return $user->requestFuels;
     }
 
 
@@ -43,12 +61,13 @@ class RequestFuelController extends Controller
 
         DB::transaction(function () use($transport,$driver,$request) {
             $newRequest = RequestFuel::create([
+                'user_id' => auth()->id(),
                 'driver_id' => $driver->id,
                 'distance_km' => $request->SKM,
                 'fuel_type' => $request->fuelType
             ]);
 
-            $newRequest->approves()->create([
+            $newRequest->approve()->create([
 
                 'department_id' => $transport->id,
                 'comment' => 'default comment',
@@ -59,22 +78,6 @@ class RequestFuelController extends Controller
     }
 
 
-    public function show(RequestFuel $requestFuel)
-    {
-        //
-    }
-
-
-    public function update(Request $request, RequestFuel $requestFuel)
-    {
-        //
-    }
-
-
-    public function destroy(RequestFuel $requestFuel)
-    {
-        //
-    }
 
     public function requestApproved(Request $request){
 
@@ -84,6 +87,7 @@ class RequestFuelController extends Controller
 
             $fuelRequest->fuel_quantity = (int) $request->quantity ;
             $fuelRequest->fuel_price = (int) $request->price;
+            $fuelRequest->gas_station_id = (int) $request->gasStationID;
             $fuelRequest->save();
 
 

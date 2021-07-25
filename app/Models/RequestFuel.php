@@ -11,8 +11,11 @@ class RequestFuel extends Model
     use HasFactory;
     protected $guarded = [];
 
-    public function approves()
+    public function approve()
     {
-        return $this->morphMany(Approve::class, 'approveable');
+        return $this->morphOne(Approve::class, 'approveable');
+    }
+    public function user(){
+        return $this->belongsTo(User::class);
     }
 }
