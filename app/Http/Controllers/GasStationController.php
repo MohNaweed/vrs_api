@@ -44,8 +44,14 @@ class GasStationController extends Controller
         ]);
     }
 
-    public function destroy(GasStation $gasStation)
+    public function destroy(Request $request)
     {
+        //return 'heyyyyy';
+        return $request;
         return GasStation::destroy($gasStation->id);
+    }
+
+    public function delete($id){
+        return GasStation::destroy($id);
     }
 }

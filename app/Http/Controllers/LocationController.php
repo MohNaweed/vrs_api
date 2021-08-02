@@ -16,7 +16,10 @@ class LocationController extends Controller
     public function store(Request $request)
     {
         return Location::create([
-            'address' => $request->address,
+            'state' => $request->state ?? null,
+            'city' => $request->city ?? null,
+            'province' => $request->province ?? null,
+            'country' => $request->country ?? null,
             'longitude'=> $request->longitude ?? null,
             'latitude'=> $request->latitude ?? null,
             'location_info'=> $request->location_info ?? null
@@ -32,7 +35,10 @@ class LocationController extends Controller
     public function update(Request $request, Location $location)
     {
         $location->update([
-            'address' => $request->address,
+            'state' => $request->state ?? null,
+            'city' => $request->city ?? null,
+            'province' => $request->province ?? null,
+            'country' => $request->country ?? null,
             'longitude'=> $request->longitude ?? null,
             'latitude'=> $request->latitude ?? null,
             'location_info'=> $request->location_info ?? null

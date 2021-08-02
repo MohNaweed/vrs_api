@@ -46,11 +46,11 @@ class DepartmentController extends Controller
      */
     public function update(Request $request, Department $department)
     {
-        return $request;
+        //return $request;
         $department->update([
             'name' => $request->name,
             'description'=> $request->description ?? null,
-            'employees_count' => 5
+            //'employees_count' => 5
         ]);
 
         return $department;

@@ -35,7 +35,7 @@ class VehicleController extends Controller
             'type' => $request->type ?? null,
             'branch_no' => $request->branch_no ?? null,
             'province' => $request->province ?? null,
-            'driver_id' => $request->driver_id ?? null
+            //'driver_id' => $request->driver_id ?? null
         ]);
     }
 
@@ -59,7 +59,7 @@ class VehicleController extends Controller
      */
     public function update(Request $request, Vehicle $vehicle)
     {
-        return $request;
+       //return $request;
         $vehicle->update([
             'vehicle_no' => $request->vehicle_no,
             'model'=> $request->model,
@@ -69,7 +69,7 @@ class VehicleController extends Controller
             'type' => $request->type,
             'branch_no' => $request->branch_no,
             'province' => $request->province,
-            'driver_id' => $request->driver_id
+            //'driver_id' => $request->driver_id
         ]);
 
         return $vehicle;

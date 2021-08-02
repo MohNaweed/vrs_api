@@ -48,7 +48,7 @@ Route::prefix('v1')->group(function () {
             'requests' => 'App\Http\Controllers\RequestController',
             'locations' => 'App\Http\Controllers\LocationController',
             'requestfuel' => 'App\Http\Controllers\RequestFuelController',
-            'gasstation' => 'App\Http\Controllers\GasStationController',
+            'gasstations' => 'App\Http\Controllers\GasStationController',
         ]);
         Route::post('/requests/all','App\Http\Controllers\RequestController@allRequest');
         Route::post('/requests/cleared','App\Http\Controllers\RequestController@clearedRequests');
@@ -59,7 +59,7 @@ Route::prefix('v1')->group(function () {
         Route::post('/requests/fuel/all','App\Http\Controllers\RequestFuelController@allRequest');
         Route::post('/requests/fuel/pendings','App\Http\Controllers\RequestFuelController@pendingRequests');
         Route::post('/requests/fuel/approved','App\Http\Controllers\RequestFuelController@requestApproved');
-        Route::post('/test','App\Http\Controllers\RequestController@test');
+
 
         //Notifications API
         Route::get('/notifications/read','App\Http\Controllers\NotificationController@readNotifications');
@@ -67,6 +67,11 @@ Route::prefix('v1')->group(function () {
         Route::get('/notifications/unread','App\Http\Controllers\NotificationController@unreadNotifications');
         Route::post('/notifications/markasread','App\Http\Controllers\NotificationController@markAsReadNotifications');
         Route::post('/notifications/destroy','App\Http\Controllers\NotificationController@destroyNotifications');
+
+        //tests
+        Route::post('/test','App\Http\Controllers\RequestController@test');
+        Route::get('/vehicle/notrelated','App\Http\Controllers\DriverController@doesNotHaveVechile');
+        Route::get('/gasstations/delete/{id}','App\Http\Controllers\GasStationController@delete');
     });
 });
 

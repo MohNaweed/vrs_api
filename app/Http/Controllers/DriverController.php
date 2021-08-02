@@ -20,6 +20,10 @@ class DriverController extends Controller
         return Driver::all();
     }
 
+    public function doesNotHaveVechile(){
+        return Driver::doesntHave('Vehicle')->get();
+    }
+
     /**
      * Store a newly created resource in storage.
      *
@@ -35,8 +39,9 @@ class DriverController extends Controller
             'license_expiry_date' => $request->license_expiry_date ?? null,
             'mobile_no' => $request->mobile_no ?? null,
             'NIN' => $request->NIN,
-            'branch_no' => $request->branch_no ?? null,
-            'province' => $request->province ?? null
+            'vehicle_id'=> $request->vehicle
+            //'branch_no' => $request->branch_no ?? null,
+            //'province' => $request->province ?? null
         ]);
     }
 
@@ -68,8 +73,9 @@ class DriverController extends Controller
             'license_expiry_date' => $request->license_expiry_date ?? null,
             'mobile_no' => $request->mobile_no ?? null,
             'NIN' => $request->NIN,
-            'branch_no' => $request->branch_no ?? null,
-            'province' => $request->province ?? null
+            'vehicle_id' => $request->vehicle
+            //'branch_no' => $request->branch_no ?? null,
+            //'province' => $request->province ?? null
         ]);
 
         return $driver;
