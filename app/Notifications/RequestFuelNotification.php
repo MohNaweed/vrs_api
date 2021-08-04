@@ -7,9 +7,9 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\BroadcastMessage;
-use App\Models\RequestVehicle;
+use App\Models\RequestFuel;
 
-class RequestVehicleNotification extends Notification implements ShouldQueue
+class RequestFuelNotification extends Notification implements ShouldQueue
 {
     use Queueable;
     private $requestData = '';
@@ -48,6 +48,6 @@ class RequestVehicleNotification extends Notification implements ShouldQueue
 
     public function broadcastType()
     {
-        return 'new-vehicle-request';
+        return 'new-fuel-request';
     }
 }

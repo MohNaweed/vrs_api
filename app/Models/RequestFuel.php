@@ -18,4 +18,13 @@ class RequestFuel extends Model
     public function user(){
         return $this->belongsTo(User::class);
     }
+
+    public function gasstation()
+    {
+        return $this->belongsTo(GasStation::class,'gas_station_id');
+    }
+
+    public function driver(){
+        return $this->belongsTo(Driver::class);
+    }
 }

@@ -14,13 +14,13 @@ use Illuminate\Http\Request;
 class RequestFuelController extends Controller
 {
 
-    public function allRequest(){
+    public function clearedRequest(){
         $user = User::find(auth()->id());
 
         $user->department;
         if($user->department->name === 'Transport'  && $user->department_position === 'head'){
 
-            $requests = RequestFuel::with(['approve.department'])->whereHas('approve', function (Builder $query){
+            $requests = RequestFuel::with(['approve.department','driver.vehicle','gasstation'])->whereHas('approve', function (Builder $query){
 
                 $query->where('approved', 1);
             })->get();
@@ -37,7 +37,7 @@ class RequestFuelController extends Controller
         $user->department;
         if($user->department->name === 'Transport'  && $user->department_position === 'head'){
 
-            $requests = RequestFuel::with('approve')->whereHas('approve', function (Builder $query){
+            $requests = RequestFuel::with(['approve.department','driver.vehicle','gasstation'])->whereHas('approve', function (Builder $query){
 
                 $query->where('approved', 0);
             })->get();
@@ -49,7 +49,7 @@ class RequestFuelController extends Controller
     public function index()
     {
         $user = User::find(auth()->id());
-        return $user->requestFuels;
+        return RequestFuel::with(['approve.department','driver.vehicle','gasstation'])->where('user_id',$user->id)->get();
     }
 
 

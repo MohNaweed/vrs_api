@@ -9,4 +9,9 @@ class GasStation extends Model
 {
     use HasFactory;
     protected $guarded = [];
+
+
+    public function requestfuels(){
+        return $this->hasMany(RequestFuel::class,'gas_station_id');
+    }
 }

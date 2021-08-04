@@ -4,11 +4,20 @@ namespace App\Http\Controllers;
 
 use App\Models\Driver;
 use Illuminate\Http\Request;
+use App\Models\RequestVehicle;
+use App\Models\User;
 
 class DriverController extends Controller
 {
     public function login(){
         return 0;
+    }
+
+
+    public function driverRelevantVehicleRequests(){
+        $user = User::find(auth()->id());
+        return RequestVehicle::with(['sourceLocation','destinationLocation','approves.department','user.department','driver.vehicle'])->where('driver_id',$user->is_driver)->where('status','clear')->get();
+
     }
     /**
      * Display a listing of the resource.
